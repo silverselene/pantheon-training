@@ -114,9 +114,9 @@ a:hover { color: var(--gold); }
 }
 
 .hero h1 {
-  font: 600 54px/1.1 'Cormorant Garamond', serif;
-  margin: 10px 0 6px;
-  font-style: italic;
+  font: 700 50px/1.1 'Cinzel Decorative', serif;
+  margin: 14px 0 10px;
+  letter-spacing: -.01em;
 }
 
 .hero .tagline {
