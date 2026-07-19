@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pantheon Training — Choose Your God</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="brand">
+    <div class="mark">PANTHEON</div>
+    <div class="sub">TRAINING</div>
+  </div>
+  <div class="badges" id="headerBadges"></div>
+</header>
+
+<div class="hero">
+  <div class="kicker">SEVEN GODS · SEVEN WAYS TO TRAIN</div>
+  <h1>Choose your god. Earn your strength.</h1>
+  <div class="tagline">Every session is an offering — finish it and the pillar rises.</div>
+</div>
+
+<div class="temple">
+  <div class="pediment"><span>ΓΥΜΝΆΣΙΟΝ</span></div>
+  <div class="architrave"></div>
+  <div class="colonnade" id="colonnade"></div>
+  <div class="stylobate"></div>
+</div>
+
+<div class="archive">
+  <div class="archive-head">
+    <div class="title-group">
+      <h2>Exercise Archive</h2>
+      <div class="count"><span id="resultCount">0</span> rites of training — retag any exercise to its rightful god</div>
+    </div>
+    <input id="searchInput" class="search-input" placeholder="Search the archive…">
+  </div>
+
+  <div class="filters" id="filters">
+    <span class="filter-label">GOD</span>
+    <button class="pill active" id="clearGodBtn">ALL</button>
+    <span id="godPills"></span>
+    <span class="divider-v"></span>
+    <select id="equipSelect" class="select">
+      <option value="all">ALL EQUIPMENT</option>
+    </select>
+  </div>
+
+  <div class="archive-table">
+    <div class="archive-headrow">
+      <span>EXERCISE</span><span>GOD</span><span>MUSCLE</span><span>EQUIPMENT</span><span></span>
+    </div>
+    <div id="archiveRows"></div>
+    <div class="no-results" id="noResults" style="display:none">The archive holds no such rite. Clear a filter and search again.</div>
+  </div>
+</div>
+
+<template id="columnTemplate">
+  <a class="column-link" href="workout.html">
+    <div class="style-label"></div>
+    <div class="capital-abacus"></div>
+    <div class="capital-echinus"></div>
+    <div class="capital-volutes">
+      <div class="volute"></div>
+      <div class="capital-channel"></div>
+      <div class="volute"></div>
+    </div>
+    <div class="capital-cushion"><span class="palmette">✦</span></div>
+    <div class="column-shaft"></div>
+    <div class="column-base-torus"></div>
+    <div class="column-base-plinth"></div>
+    <div class="column-plate">
+      <div class="name"></div>
+      <div class="epithet"></div>
+    </div>
+    <div class="column-progress">
+      <div class="row"><span class="lvl"></span><span class="xp"></span></div>
+      <div class="track"><div class="fill"></div></div>
+    </div>
+  </a>
+</template>
+
+<script src="js/data.js"></script>
+<script src="js/state.js"></script>
+<script src="js/header.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>
