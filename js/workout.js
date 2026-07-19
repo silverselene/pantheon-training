@@ -66,6 +66,13 @@
     return all + rest;
   }
 
+  function unitToggleHtml() {
+    const units = [['kg', 'KG'], ['lb', 'LB']];
+    return units.map(([id, label]) =>
+      `<button class="unit-pill${state.weightUnit === id ? ' active' : ''}" data-unit="${id}">${label}</button>`
+    ).join('');
+  }
+
   function render() {
     const xp = getXp(state, god.id);
     const lvl = godLevel(xp);
@@ -99,6 +106,10 @@
           <div class="setting-filter-row">
             <span class="filter-label">WHERE YOU TRAIN</span>
             <span id="settingPills">${settingPillsHtml()}</span>
+            <span class="unit-toggle-row">
+              <span class="filter-label">WEIGHTS</span>
+              ${unitToggleHtml()}
+            </span>
           </div>
 
           <div class="section-title">Today's Rite<span class="rite-progress-label">${done} / ${sets} SETS</span></div>
@@ -109,6 +120,7 @@
               const dots = Array.from({ length: item.sets }, (_, s) =>
                 `<button class="set-dot${s < progress[i] ? ' done' : ''}" data-ex="${i}" data-set="${s}">${s + 1}</button>`
               ).join('');
+              const weight = getWeight(state, item.name);
               return `
                 <div class="exercise">
                   <div>
@@ -117,6 +129,10 @@
                   </div>
                   <div>
                     <div class="exercise-sets">${item.sets} × ${item.reps}</div>
+                    <div class="weight-field">
+                      <input type="number" class="weight-input" data-ex="${i}" value="${weight ?? ''}" placeholder="—" step="0.5" min="0" inputmode="decimal" aria-label="Weight for ${item.name}">
+                      <span class="weight-unit-label">${state.weightUnit}</span>
+                    </div>
                     <div class="set-dots">${dots}</div>
                   </div>
                 </div>
@@ -151,6 +167,21 @@
         setTrainingSetting(state, currentSetting);
         rebuildPlan();
         render();
+      });
+    });
+
+    page.querySelectorAll('.unit-pill').forEach(btn => {
+      btn.addEventListener('click', () => {
+        setWeightUnit(state, btn.dataset.unit);
+        render();
+      });
+    });
+
+    page.querySelectorAll('.weight-input').forEach(inp => {
+      inp.addEventListener('change', () => {
+        const i = Number(inp.dataset.ex);
+        const val = inp.value === '' ? null : Number(inp.value);
+        setWeight(state, plan[i].name, val);
       });
     });
 
