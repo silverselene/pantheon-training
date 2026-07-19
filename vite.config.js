@@ -1,5 +1,8 @@
 import { defineConfig } from 'vite';
 import { resolve } from 'path';
+import { fileURLToPath } from 'url';
+
+const __dirname = fileURLToPath(new URL('.', import.meta.url));
 
 // Bare-bones static site — no framework, no bundler-specific syntax in the
 // HTML/CSS/JS. Vite just needs to know about the second page so it's
