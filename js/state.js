@@ -12,11 +12,19 @@ function loadState() {
   } catch (e) {
     saved = null;
   }
-  if (saved && saved.godXp) return saved;
+  if (saved && saved.godXp) {
+    saved.setting = saved.setting || 'all';
+    return saved;
+  }
 
   const godXp = {};
   GODS.forEach(g => { godXp[g.id] = g.xp; });
-  return { streak: 12, lastCompletedDate: null, godXp };
+  return { streak: 12, lastCompletedDate: null, godXp, setting: 'all' };
+}
+
+function setTrainingSetting(state, settingId) {
+  state.setting = settingId;
+  saveState(state);
 }
 
 function saveState(state) {

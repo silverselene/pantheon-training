@@ -222,6 +222,51 @@ a { color: var(--accent-light, var(--cream)); }
   gap: 20px;
 }
 
+/* ── SETTING FILTER ── */
+.setting-filter-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 22px;
+}
+
+.setting-filter-row .filter-label {
+  font-family: 'Cinzel', serif;
+  font-size: 11px;
+  letter-spacing: .12em;
+  color: var(--mid, #7A3A2E);
+  margin-right: 4px;
+}
+
+.setting-filter-row .pill {
+  border: 1px solid color-mix(in srgb, var(--accent, #C0392B) 40%, transparent);
+  border-radius: 16px;
+  padding: 4px 12px;
+  font: 600 11px 'Cinzel', serif;
+  letter-spacing: .06em;
+  background: transparent;
+  color: var(--accent-light, var(--cream));
+  cursor: pointer;
+}
+
+.setting-filter-row .pill.active {
+  background: var(--accent, #C0392B);
+  color: var(--cream);
+  border-color: var(--accent, #C0392B);
+}
+
+.empty-rite {
+  padding: 28px 20px;
+  font-style: italic;
+  font-size: 15px;
+  color: var(--accent-pale, #F5C6C1);
+  opacity: .8;
+  text-align: center;
+  border: 1px dashed color-mix(in srgb, var(--accent, #C0392B) 30%, transparent);
+  margin-bottom: 40px;
+}
+
 /* ── SECTION HEADER ── */
 .section-title {
   font-family: 'Cinzel', serif;
