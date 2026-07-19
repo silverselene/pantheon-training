@@ -1,15 +1,24 @@
 // Player progress, persisted to localStorage. Seeded from the static GODS data on first visit.
 const STATE_KEY = 'pantheon_state_v1';
 
+// Local calendar date as YYYY-MM-DD. Deliberately not toISOString() (which is
+// UTC) — a streak should track the user's actual day, not UTC's.
+function dateStr(d) {
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${y}-${m}-${day}`;
+}
+
 function todayStr() {
-  return new Date().toISOString().slice(0, 10);
+  return dateStr(new Date());
 }
 
 function loadState() {
-  let saved = null;
+  let saved;
   try {
     saved = JSON.parse(localStorage.getItem(STATE_KEY));
-  } catch (e) {
+  } catch {
     saved = null;
   }
   if (saved && saved.godXp) return saved;
@@ -34,7 +43,9 @@ function awardXp(state, godId, amount) {
   if (state.lastCompletedDate === today) {
     // already logged a session today, streak unchanged
   } else {
-    const yesterday = new Date(Date.now() - 86400000).toISOString().slice(0, 10);
+    const y = new Date();
+    y.setDate(y.getDate() - 1);
+    const yesterday = dateStr(y);
     state.streak = state.lastCompletedDate === yesterday ? state.streak + 1 : 1;
     state.lastCompletedDate = today;
   }
