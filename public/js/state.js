@@ -21,11 +21,51 @@ function loadState() {
   } catch {
     saved = null;
   }
-  if (saved && saved.godXp) return saved;
+  if (saved && saved.godXp) {
+    saved.setting = saved.setting || 'all';
+    saved.weights = saved.weights || {};
+    saved.weightUnit = saved.weightUnit || 'kg';
+    return saved;
+  }
 
   const godXp = {};
   GODS.forEach(g => { godXp[g.id] = g.xp; });
-  return { streak: 12, lastCompletedDate: null, godXp };
+  return { streak: 12, lastCompletedDate: null, godXp, setting: 'all', weights: {}, weightUnit: 'kg' };
+}
+
+function setTrainingSetting(state, settingId) {
+  state.setting = settingId;
+  saveState(state);
+}
+
+// Weight tracked per exercise (by name), in the unit stored in state.weightUnit.
+function getWeight(state, exerciseName) {
+  return state.weights[exerciseName] ?? null;
+}
+
+function setWeight(state, exerciseName, value) {
+  if (value === null || value === '' || Number.isNaN(value)) {
+    delete state.weights[exerciseName];
+  } else {
+    state.weights[exerciseName] = value;
+  }
+  saveState(state);
+}
+
+const KG_TO_LB = 2.20462;
+
+function roundWeight(value) {
+  return Math.round(value * 2) / 2; // nearest 0.5
+}
+
+function setWeightUnit(state, unit) {
+  if (unit === state.weightUnit) return;
+  const factor = unit === 'lb' ? KG_TO_LB : 1 / KG_TO_LB;
+  Object.keys(state.weights).forEach(name => {
+    state.weights[name] = roundWeight(state.weights[name] * factor);
+  });
+  state.weightUnit = unit;
+  saveState(state);
 }
 
 function saveState(state) {

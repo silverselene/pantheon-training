@@ -46,7 +46,7 @@
     node.querySelector('.card-equip').textContent = g.equipmentLine;
 
     const samplesEl = node.querySelector('.card-samples');
-    const samples = (WORKOUTS[g.id] || []).slice(0, 3);
+    const samples = EXERCISES.filter(e => e.god === g.id).slice(0, 3);
     samples.forEach(ex => {
       const tag = document.createElement('span');
       tag.className = 'sample-tag';
@@ -61,21 +61,15 @@
   const searchInput = document.getElementById('searchInput');
   const clearGodBtn = document.getElementById('clearGodBtn');
   const godPillsEl = document.getElementById('godPills');
-  const equipSelect = document.getElementById('equipSelect');
+  const clearSettingBtn = document.getElementById('clearSettingBtn');
+  const settingPillsEl = document.getElementById('settingPills');
   const rowsEl = document.getElementById('archiveRows');
   const noResultsEl = document.getElementById('noResults');
   const resultCountEl = document.getElementById('resultCount');
 
   const byId = Object.fromEntries(GODS.map(g => [g.id, g]));
-  const equipOptions = [...new Set(EXERCISES.map(e => e.equip))].sort();
-  equipOptions.forEach(eq => {
-    const opt = document.createElement('option');
-    opt.value = eq;
-    opt.textContent = eq;
-    equipSelect.appendChild(opt);
-  });
 
-  const filterState = { search: '', god: 'all', equip: 'all' };
+  const filterState = { search: '', god: 'all', setting: state.setting };
   const retags = {}; // exercise index -> reassigned god id (session-only)
 
   function renderGodPills() {
@@ -99,12 +93,29 @@
     clearGodBtn.classList.toggle('active', filterState.god === 'all');
   }
 
+  function renderSettingPills() {
+    settingPillsEl.innerHTML = '';
+    TRAINING_SETTINGS.forEach(s => {
+      const btn = document.createElement('button');
+      btn.className = 'pill' + (filterState.setting === s.id ? ' active' : '');
+      btn.textContent = s.label.toUpperCase();
+      btn.addEventListener('click', () => {
+        filterState.setting = filterState.setting === s.id ? 'all' : s.id;
+        setTrainingSetting(state, filterState.setting);
+        renderSettingPills();
+        renderRows();
+      });
+      settingPillsEl.appendChild(btn);
+    });
+    clearSettingBtn.classList.toggle('active', filterState.setting === 'all');
+  }
+
   function renderRows() {
     const q = filterState.search.toLowerCase();
     const withTags = EXERCISES.map((e, i) => ({ ...e, god: retags[i] ?? e.god, _i: i }));
     const filtered = withTags
       .filter(e => filterState.god === 'all' || e.god === filterState.god)
-      .filter(e => filterState.equip === 'all' || e.equip === filterState.equip)
+      .filter(e => filterState.setting === 'all' || e.settings.includes(filterState.setting))
       .filter(e => !q || e.name.toLowerCase().includes(q) || e.muscle.toLowerCase().includes(q));
 
     resultCountEl.textContent = filtered.length;
@@ -153,11 +164,14 @@
     renderGodPills();
     renderRows();
   });
-  equipSelect.addEventListener('change', ev => {
-    filterState.equip = ev.target.value;
+  clearSettingBtn.addEventListener('click', () => {
+    filterState.setting = 'all';
+    setTrainingSetting(state, 'all');
+    renderSettingPills();
     renderRows();
   });
 
   renderGodPills();
+  renderSettingPills();
   renderRows();
 })();
