@@ -28,6 +28,35 @@
     colonnade.appendChild(node);
   });
 
+  // ---------- god cards ----------
+  const godCardsEl = document.getElementById('godCards');
+  const cardTemplate = document.getElementById('godCardTemplate');
+
+  GODS.forEach(g => {
+    const node = cardTemplate.content.cloneNode(true);
+    const card = node.querySelector('.god-card');
+    card.href = `workout.html?god=${g.id}`;
+    card.style.setProperty('--god', g.color);
+    card.style.setProperty('--god-dark', g.dark);
+    card.style.setProperty('--god-tint', g.tint);
+
+    node.querySelector('.card-name').textContent = g.name.toUpperCase();
+    node.querySelector('.card-style').textContent = g.style.toUpperCase();
+    node.querySelector('.card-copy').textContent = g.cardCopy;
+    node.querySelector('.card-equip').textContent = g.equipmentLine;
+
+    const samplesEl = node.querySelector('.card-samples');
+    const samples = (WORKOUTS[g.id] || []).slice(0, 3);
+    samples.forEach(ex => {
+      const tag = document.createElement('span');
+      tag.className = 'sample-tag';
+      tag.textContent = ex.name;
+      samplesEl.appendChild(tag);
+    });
+
+    godCardsEl.appendChild(node);
+  });
+
   // ---------- archive ----------
   const searchInput = document.getElementById('searchInput');
   const clearGodBtn = document.getElementById('clearGodBtn');

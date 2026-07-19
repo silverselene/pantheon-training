@@ -14,14 +14,15 @@
   }
 
   document.title = `Pantheon Training — ${god.name}'s Rite`;
-  page.style.setProperty('--god', god.color);
-  page.style.setProperty('--god-dark', god.dark);
-  page.style.setProperty('--god-tint', god.tint);
+  document.body.style.setProperty('--accent', god.theme.accent);
+  document.body.style.setProperty('--accent-light', god.theme.light);
+  document.body.style.setProperty('--accent-pale', god.theme.pale);
+  document.body.style.setProperty('--mid', god.theme.mid);
 
   const plan = WORKOUTS[god.id] || [];
   const exByName = Object.fromEntries(EXERCISES.filter(e => e.god === god.id).map(e => [e.name, e]));
 
-  // progress: { exerciseIndex: completedSetCount }
+  // progress: number of completed sets per exercise
   const progress = plan.map(() => 0);
   const totalSets = plan.reduce((sum, item) => sum + item.sets, 0);
 
@@ -29,81 +30,101 @@
     return progress.reduce((a, b) => a + b, 0);
   }
 
-  function xpRow() {
-    const xp = getXp(state, god.id);
-    const lvl = godLevel(xp);
-    const pct = godProgressPct(xp);
-    return { xp, lvl, pct };
+  function mediaPanelHtml() {
+    if (god.youtubePlaylistId) {
+      return `
+        <div class="media-frame">
+          <iframe src="https://www.youtube.com/embed/videoseries?list=${god.youtubePlaylistId}"
+            title="${god.name} training playlist" allowfullscreen></iframe>
+        </div>
+      `;
+    }
+    return `
+      <div class="media-frame">
+        <div class="media-placeholder">
+          <div class="icon">${god.icon}</div>
+          <div class="msg">No playlist linked yet.<br>Add a YouTube playlist ID for ${god.name} in data.js.</div>
+        </div>
+      </div>
+    `;
   }
 
   function render() {
-    const { xp, lvl, pct } = xpRow();
+    const xp = getXp(state, god.id);
+    const lvl = godLevel(xp);
     const done = totalDone();
     const allDone = done === totalSets && totalSets > 0;
 
-    const moreExercises = EXERCISES.filter(e => e.god === god.id && !plan.find(p => p.name === e.name));
-
     page.innerHTML = `
-      <div class="god-banner">
-        <div class="style-label">${god.style.toUpperCase()}</div>
-        <h1>${god.name.toUpperCase()}</h1>
-        <div class="epithet">${god.epithet}</div>
-        <div class="blurb">${god.blurb}</div>
-        <div class="god-level-row"><span class="tier">${tierForLevel(lvl)} · LVL ${lvl}</span></div>
-      </div>
-      <div class="god-xp-track">
-        <div class="row"><span>PROGRESS TO NEXT LEVEL</span><span>${xp} XP</span></div>
-        <div class="track"><div class="fill" style="width:${pct}%"></div></div>
+      <div class="header">
+        <div class="eyebrow">The Divine Training Series · ${god.style}</div>
+        <div class="god-icon">${god.icon}</div>
+        <div class="god-name">${god.name.toUpperCase()}</div>
+        <div class="subtitle">${god.epithet} · ${tierForLevel(lvl)} LVL ${lvl}</div>
+        <div class="divider">
+          <div class="divider-line"></div>
+          <div class="divider-ornament">${god.ornament}</div>
+          <div class="divider-line"></div>
+        </div>
+        <div class="subtitle equip-line">${god.equipmentLine}</div>
       </div>
 
-      <div class="rite">
-        <div class="rite-head">
-          <h2>Today's Rite</h2>
-          <div class="rite-progress">${done} / ${totalSets} SETS</div>
-        </div>
-        <div class="rite-list">
-          ${plan.map((item, i) => {
-            const meta = exByName[item.name] || {};
-            const dots = Array.from({ length: item.sets }, (_, s) =>
-              `<button class="set-dot${s < progress[i] ? ' done' : ''}" data-ex="${i}" data-set="${s}">${s + 1}</button>`
-            ).join('');
-            return `
-              <div class="rite-item">
-                <div class="top-row">
-                  <span class="ex-name">${item.name}</span>
-                  <span class="prescribed">${item.sets} × ${item.reps}${meta.muscle ? ` · ${meta.muscle}` : ''}</span>
+      <div class="stats-bar">
+        <div class="stat"><span class="stat-value">${plan.length}</span><span class="stat-label">Exercises</span></div>
+        <div class="stat"><span class="stat-value">${totalSets}</span><span class="stat-label">Total Sets</span></div>
+        <div class="stat"><span class="stat-value">${lvl}</span><span class="stat-label">Level</span></div>
+        <div class="stat"><span class="stat-value">${god.style}</span><span class="stat-label">Mission</span></div>
+      </div>
+
+      <div class="layout-grid">
+        <div class="left-col">
+          <div class="section-title">Today's Rite<span class="rite-progress-label">${done} / ${totalSets} SETS</span></div>
+          <div class="exercise-list">
+            ${plan.map((item, i) => {
+              const meta = exByName[item.name] || {};
+              const dots = Array.from({ length: item.sets }, (_, s) =>
+                `<button class="set-dot${s < progress[i] ? ' done' : ''}" data-ex="${i}" data-set="${s}">${s + 1}</button>`
+              ).join('');
+              return `
+                <div class="exercise">
+                  <div>
+                    <div class="exercise-name">${item.name}${meta.muscle ? ` <span style="opacity:.5;font-size:13px">— ${meta.muscle}</span>` : ''}</div>
+                    ${item.note ? `<div class="exercise-note">${item.note}</div>` : ''}
+                  </div>
+                  <div>
+                    <div class="exercise-sets">${item.sets} × ${item.reps}</div>
+                    <div class="set-dots">${dots}</div>
+                  </div>
                 </div>
-                <div class="set-dots">${dots}</div>
-              </div>
-            `;
-          }).join('')}
+              `;
+            }).join('')}
+          </div>
+
+          <div class="wisdom-box">
+            <div class="wisdom-title">${god.name}'s Command</div>
+            <div class="wisdom-text">${god.command}</div>
+          </div>
+        </div>
+
+        <div class="right-col">
+          <div class="media-panel">
+            <div class="section-title">Session Playlist</div>
+            ${mediaPanelHtml()}
+          </div>
+
+          <div class="complete-panel">
+            <div class="rite-progress-value">${done} / ${totalSets} SETS COMPLETE</div>
+            <button id="completeBtn" class="complete-btn" ${allDone ? '' : 'disabled'}>COMPLETE THE RITE</button>
+            <div id="offeringMsg"></div>
+          </div>
         </div>
       </div>
-
-      <div class="complete-cta">
-        <button id="completeBtn" class="complete-btn" ${allDone ? '' : 'disabled'}>
-          COMPLETE THE RITE
-        </button>
-        <div id="offeringMsg"></div>
-      </div>
-
-      ${moreExercises.length ? `
-        <div class="more-rites">
-          <h3>More Exercises of ${god.name}</h3>
-          <ul>${moreExercises.map(e => `<li>${e.name} — <em>${e.muscle}</em></li>`).join('')}</ul>
-        </div>
-      ` : ''}
-
-      <p style="text-align:center;margin:-10px 0 40px">
-        <a class="back-link" href="index.html">← Return to the Temple</a>
-      </p>
     `;
 
     page.querySelectorAll('.set-dot').forEach(dot => {
       dot.addEventListener('click', () => {
         const i = Number(dot.dataset.ex);
         const s = Number(dot.dataset.set);
-        // toggling a dot fills/empties up through that set
         progress[i] = progress[i] > s ? s : s + 1;
         render();
       });
@@ -118,10 +139,6 @@
         document.getElementById('offeringMsg').innerHTML =
           `<div class="offering-msg">An offering accepted, ${amount} XP earned. The pillar of ${god.name} rises.</div>`;
         completeBtn.disabled = true;
-        const { xp, lvl, pct } = xpRow();
-        document.querySelector('.god-xp-track .row span:last-child').textContent = `${xp} XP`;
-        document.querySelector('.god-xp-track .fill').style.width = `${pct}%`;
-        document.querySelector('.god-level-row .tier').textContent = `${tierForLevel(lvl)} · LVL ${lvl}`;
       });
     }
   }
